@@ -95,12 +95,12 @@ is recommended.
   - adjust default-boot configuration in EXTRA_ENV_SETTING
   - set BOOTDELAY to 0
 
-You must decide if you want u-boot to load the kernel image an the
-device-tree via TFTP or if you want to downlad them via JTAG yourself.
+You must decide if you want u-boot to load the kernel image and the
+device-tree via TFTP or if you want to downlad them via JTAG.
 TFTP is much faster than JTAG but requires a TFTP-Server.
 
 TFTP-Configuration:
-Export your kernel image and device-tree-blob via tft.
+Export your kernel image and device-tree-blob via tftp.
 
 "jtagboot=echo TFTPing Linux to RAM...;" \
          "tftp 0x3000000 ${kernel_image};" \
