@@ -55,7 +55,7 @@ echo "Copying base design and ReconOS hardware ..."
 edk=edk_${RECONOS_ARCH}_${RECONOS_OS}
 
 # copy base design and pcores
-cp -r ${RECONOS}/designs/${RECONOS_ARCH}_${RECONOS_OS}_${base_design} $edk
+cp -rT ${RECONOS}/designs/${RECONOS_ARCH}_${RECONOS_OS}_${base_design} $edk
 mkdir -p $edk/pcores
 cp -r ${RECONOS}/pcores/* $edk/pcores
 
