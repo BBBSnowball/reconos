@@ -38,7 +38,7 @@ following list includes all prerequisites:
      * UART connection to interact with the board
 
 This guide uses several external sources and downloads them to your
-local machine. To make shure that everything works fine you can use
+local machine. To make sure that everything works fine you can use
 the follwing tested versions or can try it with the newest ones
 available:
 
@@ -160,7 +160,7 @@ To boot and compile Linux you first have to compile U-Boot:
      > cd linux-xlnx
 
   3. Configure Linux by using the default configuration
-     If you whish you can adjust the configuration to your needs
+     If you wish you can adjust the configuration to your needs
      > make xilinx_zynq_defconfig
 
   4. Compile Linux
@@ -247,7 +247,7 @@ it from the ReconOS homepage and extract it to $WD/nfs
 For the development it has proved advantegeous to mount the root filesystem
 via NFS.
 WARNING: If you develop with other people on the same network make
-         shure that you do not use the same ip.
+         sure that you do not use the same ip or MAC address.
 
   1. Configure NFS
      Add the following line to your NFS config under /etc/exports
@@ -292,9 +292,9 @@ which must be created.
 
   1. Adjust the setup config to your working environment
        - Open $RECONOS/demos/sort_demo/hw/setup_zynq
-       - Replace
+       - Change
            base_design=zedboard_c_minimal_14.6
-         by changing the board revision and tool version
+         to match your board revision and tool version
 
   2. Create the hardware design by using the setup script
      > cd $RECONOS/demos/sort_demo/hw
