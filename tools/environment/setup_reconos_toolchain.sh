@@ -14,6 +14,11 @@
 
 echo "Setting up ReconOS toolchain ..."
 
+if [ -z "$BASH_SOURCE" ] ; then
+	echo "Please use bash!" >&2
+	return 1
+fi
+
 reconos=`dirname $BASH_SOURCE`/../..
 reconos=`cd $reconos && pwd`
 echo "ReconOS path: $reconos"
@@ -50,7 +55,7 @@ then
 	. $config
 else
 	echo "ERROR: Configuration $config does not exists"
-	return
+	return 1
 fi
 
 # add gnutools to path
