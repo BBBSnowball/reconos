@@ -1,0 +1,7 @@
+/all.prj
+/*.log
+/fuse*
+/isim.*
+/isim
+/run_test.tcl
+/test_sim
