@@ -929,8 +929,6 @@ package body reconos_test_pkg is
 		constant count    : in    natural; --TODO subtype of natural
 		constant timeout  : in    time := DEFAULT_TIMEOUT
 	) is begin
-		report "expect_fifo_push, addr = " & integer'image(addr) & ", count = " & integer'image(count);
-
 		o_fifo.m_full <= '0';
 		o_fifo.m_rem <= CONV_STD_LOGIC_VECTOR(count - 1, 16);
 
@@ -944,7 +942,6 @@ package body reconos_test_pkg is
 				report "Slave doesn't want to write anymore, but we expect more data."
 				severity failure;
 
-			report "ram(" & integer'image(addr + i) & ")";
 			ram(addr + i) := i_fifo.m_data;
 
 			wait until rising_edge(clk) for timeout;
