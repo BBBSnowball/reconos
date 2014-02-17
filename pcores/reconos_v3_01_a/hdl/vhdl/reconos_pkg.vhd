@@ -1061,11 +1061,17 @@ package body reconos_pkg is
 		signal o_ram   : out o_ram_t;
 		count          : in  std_logic_vector(C_MEMIF_LENGTH_WIDTH - 3 downto 0);
 		next_step      : integer
-	) is begin
+	) is
+		constant is_simulation : boolean := false
+			-- synthesis translate_off
+			or true
+			-- synthesis translate_on
+			;
+	begin
 		case i_ram.step is
 			when 0 =>
 				-- waiting for FIFO to become empty enough
-				-- this is not so nice, but should be now major drawback
+				-- this is not so nice, but should be no major drawback
 				-- since the FIFOs are empty most of the time
 				if i_fifo.m_full = '0' and i_fifo.m_rem >= count - 1 then
 					o_ram.count <= (others => '0');
@@ -1077,14 +1083,36 @@ package body reconos_pkg is
 				o_fifo.m_we <= '1';
 				o_fifo.m_data <= i_ram.data;
 
-				o_ram.addr <= i_ram.addr + 1;
 				o_ram.count <= i_ram.count + 1;
+
+				-- If we simply increment the address all the time, it may run out of the valid bounds near the end.
+				-- This will cause out-of-bounds errors in simulation, but it will work in hardware (because the
+				-- hardware doesn't have error checks). Therefore, we only enable the condition during simulation.
+				-- synthesis translate_off
+				if is_simulation and i_ram.count >= count - 2 then
+					o_ram.addr <= i_ram.addr;
+				else
+				-- synthesis translate_on
+					o_ram.addr <= i_ram.addr + 1;
+				-- synthesis translate_off
+				end if;
+				-- synthesis translate_on
 
 				if i_ram.count = count - 1 then
 					o_ram.step <= 2;
 				end if;
 			when others =>
-				o_ram.addr <= i_ram.addr - 2;
+				-- In simulation, we have an additional condition to keep the address below the upper bound. In hardware,
+				-- we must fix it now.
+				-- synthesis translate_off
+				if not is_simulation then
+				-- synthesis translate_on
+					o_ram.addr <= i_ram.addr - 2;
+				-- synthesis translate_off
+				else
+					o_ram.addr <= i_ram.addr;
+				end if;
+				-- synthesis translate_on
 				o_fifo.m_we <= '0';
 				o_ram.step <= 0;
 				o_fifo.step <= next_step;

@@ -82,8 +82,7 @@ architecture implementation of hwt_sort_demo is
 		2048
 		-- synthesis translate_off
 		-- less data for simulation
-		-- - 1900	--TODO This SHOULD work...
-		- 2048 + 256
+		- 1900
 		-- synthesis translate_on
 		;
 	constant C_LOCAL_RAM_ADDRESS_WIDTH : integer := clog2(C_LOCAL_RAM_SIZE);
