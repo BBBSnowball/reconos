@@ -13,6 +13,11 @@ done
 
 [ -n "$XILINX_SETTINGS_SCRIPT" ] && source "$XILINX_SETTINGS_SCRIPT"
 
+if [ -z "$XILINX" -o ! -d "$XILINX" ] ; then
+	echo "Please source the ReconOS config script or set \$XILINX_SETTINGS_SCRIPT before running this script." >&2
+	exit 1
+fi
+
 # clear all.prj
 echo -n > all.prj
 
