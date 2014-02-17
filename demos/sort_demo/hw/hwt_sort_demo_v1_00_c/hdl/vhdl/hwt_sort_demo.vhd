@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
 
 library proc_common_v3_00_a;
 use proc_common_v3_00_a.proc_common_pkg.all;
@@ -131,12 +130,18 @@ begin
 	
 	-- local dual-port RAM
 	local_ram_ctrl_1 : process (clk) is
+		variable addr : natural;
 	begin
 		if (rising_edge(clk)) then
+			addr := conv_integer(unsigned(o_RAMAddr_reconos));
+			if addr > local_ram'high then
+				report "Index " & integer'image(addr) & " would be out of bounds." severity error;
+				addr := local_ram'high;
+			end if;
 			if (o_RAMWE_reconos = '1') then
-				local_ram(conv_integer(unsigned(o_RAMAddr_reconos))) := o_RAMData_reconos;
+				local_ram(addr) := o_RAMData_reconos;
 			else
-				i_RAMData_reconos <= local_ram(conv_integer(unsigned(o_RAMAddr_reconos)));
+				i_RAMData_reconos <= local_ram(addr);
 			end if;
 		end if;
 	end process;
@@ -254,6 +259,8 @@ begin
 						len    <= conv_std_logic_vector(C_LOCAL_RAM_SIZE_IN_BYTES,24);
 						--state  <= STATE_WRITE_REQ;
 						state  <= STATE_WRITE;
+
+						report "sorting is done -> writing back the data...";
 					end if;
 					
 				-- copy data from local memory to main memory

@@ -103,6 +103,8 @@ begin
           -- start sorting on 'start' signal
           if start = '1' then
             state   <= STATE_LOAD_WAIT_A;
+
+            report "start sorting";
           end if;
 
           -- increase address (for B), wait for A to appear on RAM outputs
@@ -152,6 +154,8 @@ begin
                                          -- else we're done
                 done    <= '1';
                 state   <= STATE_IDLE;
+
+                report "sorting done";
               end if;
             end if;
           end if;
@@ -173,6 +177,8 @@ begin
               -- else we're done
               done  <= '1';
               state <= STATE_IDLE;
+
+              report "sorting done";
             end if;
           end if;
 
@@ -188,7 +194,11 @@ begin
           swapped <= false;
           state   <= STATE_LOAD_WAIT_A;
 
+          report "sorting: start over, ptr_max is " & integer'image(ptr_max);
+
         when others =>
+          report "unexpected sorting state: " & state_t'image(state) severity error;
+
           state <= STATE_IDLE;
 
       end case;
