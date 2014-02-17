@@ -911,10 +911,15 @@ package body reconos_test_pkg is
 			wait until falling_edge(clk) for timeout;
 		end loop;
 
-		--TODO Should we check s_re='0' ?
-		--     - Slave may start another read immediately.
-		--     - I think the slave doesn't reset s_re, at all.
-		--TODO Is that a bug? ^^
+		-- Even if the slave starts another read immediately, there will be a pause of at least one
+		-- clock cycle. If s_re remains high, this means that the slave is reading too much data.
+		-- The statemachine of the slave needs one more clock cycle before it actually changes s_re,
+		-- so we wait for it to do that.
+		wait until rising_edge(clk) for timeout;
+		wait until falling_edge(clk) for timeout;
+		assert i_fifo.s_re = '0'
+			report "Slave wants to read more data, but we don't have any more data at the moment. "
+				& "s_re is " & std_logic'image(i_fifo.s_re) & ".";
 
 		o_fifo.s_empty <= '1';
 		o_fifo.s_data  <= (others => 'U');
