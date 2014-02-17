@@ -78,7 +78,14 @@ architecture implementation of hwt_sort_demo is
 	-- from a given address (send in a message box), sorts them and writes them back into main memory.
 
 	-- IMPORTANT: define size of local RAM here!!!! 
-	constant C_LOCAL_RAM_SIZE          : integer := 2048;
+	constant C_LOCAL_RAM_SIZE          : integer :=
+		2048
+		-- synthesis translate_off
+		-- less data for simulation
+		-- - 1900	--TODO This SHOULD work...
+		- 2048 + 256
+		-- synthesis translate_on
+		;
 	constant C_LOCAL_RAM_ADDRESS_WIDTH : integer := clog2(C_LOCAL_RAM_SIZE);
 	constant C_LOCAL_RAM_SIZE_IN_BYTES : integer := 4*C_LOCAL_RAM_SIZE;
 
