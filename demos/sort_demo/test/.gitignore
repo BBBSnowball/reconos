@@ -4,4 +4,4 @@
 /isim.*
 /isim
 /run_test.tcl
-/test_sim
+/test_sim*
