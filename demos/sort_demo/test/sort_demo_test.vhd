@@ -12,6 +12,7 @@ use reconos_v3_01_a.reconos_pkg.all;
 library reconos_test_v3_01_a;
 use reconos_test_v3_01_a.reconos_test_pkg.all;
 use reconos_test_v3_01_a.test_helpers.all;
+use reconos_test_v3_01_a.test_helpers_array.all;
 
 library hwt_sort_demo_v1_00_c;
 use hwt_sort_demo_v1_00_c.hwt_sort_demo;
