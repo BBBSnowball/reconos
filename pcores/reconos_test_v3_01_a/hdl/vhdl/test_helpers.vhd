@@ -4,9 +4,10 @@ USE ieee.numeric_std.ALL;
 USE ieee.math_real.ALL;
 
 package test_helpers is
-  procedure assertAlmostEqual(actual : in real;
+  procedure assertAlmostEqual(actual   : in real;
                               expected : in real;
-                              epsilon : in real := 1.0e-10);
+                              what     : in string := "";
+                              epsilon  : in real := 1.0e-10);
 
   procedure endOfSimulation(dummy : in integer := 0);
 
@@ -14,34 +15,48 @@ package test_helpers is
   function to_string(sv: Std_Logic_Vector) return string;
 
   procedure assertEqual(actual   : in std_logic_vector;
-                        expected : in std_logic_vector);
+                        expected : in std_logic_vector;
+                        what     : in string := "");
 
   procedure assertEqual(actual   : in integer;
-                        expected : in integer);
+                        expected : in integer;
+                        what     : in string := "");
 
 end package test_helpers;
 
 package body test_helpers is
-  procedure assertEqual(actual :   in std_logic_vector;
-                        expected : in std_logic_vector) is
+  function format_what(what : in string := "") return string is
+  begin
+    if what = "" then
+      return "";
+    else
+      return what & ": ";
+    end if;
+  end function;
+
+  procedure assertEqual(actual   : in std_logic_vector;
+                        expected : in std_logic_vector;
+                        what     : in string := "") is
   begin
     assert actual = expected
-      report to_string(actual) & " /= " & to_string(expected);
+      report format_what(what) & to_string(actual) & " /= " & to_string(expected);
   end procedure;
 
-  procedure assertEqual(actual : in integer;
-                        expected : in integer) is
+  procedure assertEqual(actual   : in integer;
+                        expected : in integer;
+                        what     : in string := "") is
   begin
     assert actual = expected
-      report integer'image(actual) & " /= " & integer'image(expected);
+      report format_what(what) & integer'image(actual) & " /= " & integer'image(expected);
   end procedure;
 
-  procedure assertAlmostEqual(actual : in real;
+  procedure assertAlmostEqual(actual   : in real;
                               expected : in real;
-                              epsilon : in real := 1.0e-10) is    --TODO is this a good default value?
+                              what     : in string := "";
+                              epsilon  : in real := 1.0e-10) is    --TODO is this a good default value?
   begin
     assert abs(actual - expected) < epsilon
-      report real'image(actual) & " /= " & real'image(expected)
+      report format_what(what) & real'image(actual) & " /= " & real'image(expected)
         & ", difference is " & real'image(actual-expected);
   end procedure;
 

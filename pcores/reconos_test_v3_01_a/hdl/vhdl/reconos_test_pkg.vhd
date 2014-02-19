@@ -1033,7 +1033,7 @@ package body reconos_test_pkg is
 		assertCallIdEqual(tmp, expected_call_id);
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg0);
+		assertEqual(tmp, expected_arg0, "arg0 (expected call id is " & to_string(expected_call_id) & ")");
 
 		expect_fifo_pull_word(clk, i_osif, o_osif, result, timeout);
 	end procedure expect_osif_call_1;
@@ -1054,7 +1054,7 @@ package body reconos_test_pkg is
 		assertCallIdEqual(tmp, expected_call_id);
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg0);
+		assertEqual(tmp, expected_arg0, "arg0 (expected call id is " & to_string(expected_call_id) & ")");
 
 		expect_fifo_pull_word(clk, i_osif, o_osif, result1, timeout);
 
@@ -1077,10 +1077,10 @@ package body reconos_test_pkg is
 		assertCallIdEqual(tmp, expected_call_id);
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg0);
+		assertEqual(tmp, expected_arg0, "arg0 (expected call id is " & to_string(expected_call_id) & ")");
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg1);
+		assertEqual(tmp, expected_arg1, "arg1 (expected call id is " & to_string(expected_call_id) & ")");
 
 		expect_fifo_pull_word(clk, i_osif, o_osif, result, timeout);
 	end procedure expect_osif_call_2;
@@ -1118,7 +1118,7 @@ package body reconos_test_pkg is
 		variable tmp : osif_word;
 	begin
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, OSIF_CMD_THREAD_EXIT);
+		assertEqual(tmp, OSIF_CMD_THREAD_EXIT, "call id should be OSIF_CMD_THREAD_EXIT");
 	end procedure expect_osif_thread_exit;
 
 
@@ -1152,9 +1152,9 @@ package body reconos_test_pkg is
 		variable tmp : osif_word;
 	begin
 		expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-		assertEqual(tmp, MEMIF_CMD_WRITE & X"000004");
+		assertEqual(tmp, MEMIF_CMD_WRITE & X"000004", "expected MEM_IF_CMD_WRITE with length 4");
 		expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-		assertEqual(tmp, addr);
+		assertEqual(tmp, addr, "memory address for writing a word");
 		expect_fifo_push_word(clk, i_memif, o_memif, data, timeout);
 	end procedure expect_memif_write_word;
 
@@ -1169,9 +1169,9 @@ package body reconos_test_pkg is
 		variable tmp : osif_word;
 	begin
 		expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-		assertEqual(tmp, MEMIF_CMD_READ & X"000004");
+		assertEqual(tmp, MEMIF_CMD_READ & X"000004", "expected MEMIF_CMD_READ with length 4");
 		expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-		assertEqual(tmp, addr);
+		assertEqual(tmp, addr, "memory address for reading a word");
 		expect_fifo_pull_word(clk, i_memif, o_memif, data, timeout);
 	end procedure expect_memif_read_word;
 
@@ -1226,9 +1226,9 @@ package body reconos_test_pkg is
 			end if;
 		else
 			expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-			assertEqual(tmp, MEMIF_CMD_WRITE & to_memif_length(len));
+			assertEqual(tmp, MEMIF_CMD_WRITE & to_memif_length(len), "expected MEM_IF_CMD_WRITE with length " & integer'image(len));
 			expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-			assertEqual(tmp, to_addr(dst_addr));
+			assertEqual(tmp, to_addr(dst_addr), "memory address for writing data");
 
 			expect_fifo_push(clk, i_memif, o_memif, ram, ram_addr, len/4);
 		end if;
@@ -1268,9 +1268,9 @@ package body reconos_test_pkg is
 			end if;
 		else
 			expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-			assertEqual(tmp, MEMIF_CMD_READ & to_memif_length(len));
+			assertEqual(tmp, MEMIF_CMD_READ & to_memif_length(len), "expected MEMIF_CMD_READ with length " & integer'image(len));
 			expect_fifo_push_word(clk, i_memif, o_memif, tmp, timeout);
-			assertEqual(tmp, to_addr(src_addr));
+			assertEqual(tmp, to_addr(src_addr), "memory address for reading data");
 
 			expect_fifo_pull(clk, i_memif, o_memif, ram, ram_addr, len/4);
 		end if;
