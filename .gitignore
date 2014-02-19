@@ -54,3 +54,9 @@ modules.builtin
 *.swo
 *~
 \#*#
+
+#
+# Xilinx stuff and build output
+#
+/demos/*/hw/edk_*/
+_xmsgs
