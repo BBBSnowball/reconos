@@ -30,7 +30,7 @@ addPcore() {
 		source_name="$2"
 		source_type="$3"
 
-		if [ -z "$source_type" -a "$source_name" == "all" ] ; then
+		if [ -z "$source_type" ] ; then
 			# This is a library dependency.
 			return
 		fi
@@ -66,12 +66,23 @@ createProjectFile() {
 	target_project="$1"
 	shift
 
+	default_library="work"
+
 	# clear project file
 	echo -n > "$target_project"
 
 	while [ -n "$1" ] ; do
 		file="$1"
 		shift
+
+		library="${file#library:}"
+		if [ "$file" != "$library" -a -n "$library" ] ; then
+			# "library:library_name" means that *.vhd files should
+			# be in library 'library_name' instead of 'work'.
+			default_library="$library"
+
+			continue
+		fi
 
 		filename="$(basename "$file")"
 		extension="${filename##*.}"
@@ -84,7 +95,7 @@ createProjectFile() {
 				addSourcesFromProjectFile "$file" "$target_project"
 				;;
 			vhd|vhdl)
-				echo "vhdl work \"$file\"" >>"$target_project"
+				echo "vhdl $default_library \"$file\"" >>"$target_project"
 				;;
 			*)
 				echo "I don't know what I should do with '$file' (extension: $extension)." >&2
