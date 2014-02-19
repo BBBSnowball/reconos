@@ -10,11 +10,13 @@ check_environment() {
 		exit 1
 	fi
 
-	[ -n "$XILINX_SETTINGS_SCRIPT" ] && source "$XILINX_SETTINGS_SCRIPT"
-
 	if [ -z "$XILINX" -o ! -d "$XILINX" ] ; then
-		echo "Please source the ReconOS config script or set \$XILINX_SETTINGS_SCRIPT before running this script." >&2
-		exit 1
+		if [ -n "$XILINX_SETTINGS_SCRIPT" ] ; then
+			source "$XILINX_SETTINGS_SCRIPT"
+		else
+			echo "Please source the ReconOS config script or set \$XILINX_SETTINGS_SCRIPT before running this script." >&2
+			exit 1
+		fi
 	fi
 }
 
