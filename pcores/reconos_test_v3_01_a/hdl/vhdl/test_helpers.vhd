@@ -9,10 +9,6 @@ package test_helpers is
                               what     : in string := "";
                               epsilon  : in real := 1.0e-10);
 
-  procedure assertAlmostEqual(actual   : in real;
-                              expected : in real;
-                              epsilon  : in real);
-
   procedure endOfSimulation(dummy : in integer := 0);
 
   -- http://www-ee.uta.edu/online/zhu/spring_2007/tutorial/how_to_print_objexts.txt
@@ -62,13 +58,6 @@ package body test_helpers is
     assert abs(actual - expected) < epsilon
       report format_what(what) & real'image(actual) & " /= " & real'image(expected)
         & ", difference is " & real'image(actual-expected);
-  end procedure;
-
-  procedure assertAlmostEqual(actual   : in real;
-                              expected : in real;
-                              epsilon  : in real) is    --TODO is this a good default value?
-  begin
-    assertAlmostEqual(actual, expected, epsilon);
   end procedure;
 
   procedure endOfSimulation(dummy : in integer := 0) is
