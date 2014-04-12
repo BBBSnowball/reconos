@@ -6,7 +6,7 @@ AR = $(CROSS_COMPILE)ar
 HOST_CC = gcc
 HOST_AR = ar
 
-OBJS := reconos.o hwt_delegate.o legacy_os_calls/mbox.o legacy_os_calls/rqueue.o arch/arch_$(RECONOS_ARCH)_linux.o
+OBJS := reconos.o hwt_delegate.o legacy_os_calls/mbox.o legacy_os_calls/rqueue.o arch/arch_linux.o
 
 CFLAGS = -O2 -g -Wall -D"RECONOS_MMU_true" -D"RECONOS_ARCH_$(RECONOS_ARCH)" -D"RECONOS_OS_linux"
 
