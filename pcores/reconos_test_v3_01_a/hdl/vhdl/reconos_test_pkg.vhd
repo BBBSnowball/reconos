@@ -373,39 +373,41 @@ package reconos_test_pkg is
 		constant call_id : osif_word
 	) return osif_word;
 
---
---	-- Posts the semaphore specified by handle.
---	--
---	--   i_osif - i_osif_t record
---	--   o_osif - o_osif_t record
---	--   handle - indeout representing the resource in the resource array
---	--   result - result of the osif call
---	--   done   - indicates when call finished
---	--
---	procedure osif_sem_post (
---		signal i_osif  : in  i_osif_t;
---		signal o_osif  : out o_osif_t;
---		handle         : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
---		signal result  : out std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
---		variable done  : out boolean
---	);
---
---	-- Waits for the semaphore specified by handle.
---	--
---	--   i_osif - i_osif_t record
---	--   o_osif - o_osif_t record
---	--   handle - indeout representing the resource in the resource array
---	--   result - result of the osif call
---	--   done   - indicates when call finished
---	--
---	procedure osif_sem_wait (
---		signal i_osif  : in  i_osif_t;
---		signal o_osif  : out o_osif_t;
---		handle         : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
---		signal result  : out std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
---		variable done  : out boolean
---	);
---	
+
+	-- Posts the semaphore specified by handle.
+	--
+	--   i_osif - i_osif_t record
+	--   o_osif - o_osif_t record
+	--   handle - indeout representing the resource in the resource array
+	--   result - result of the osif call
+	--   done   - indicates when call finished
+	--
+	procedure expect_osif_sem_post (
+		signal   clk     : in  std_logic;
+		signal   i_osif  : in  i_osif_test_t;
+		signal   o_osif  : out o_osif_test_t;
+		constant handle  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
+		constant result  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0) := (others => '0');
+		constant timeout : in  time := DEFAULT_TIMEOUT
+	);
+
+	-- Waits for the semaphore specified by handle.
+	--
+	--   i_osif - i_osif_t record
+	--   o_osif - o_osif_t record
+	--   handle - indeout representing the resource in the resource array
+	--   result - result of the osif call
+	--   done   - indicates when call finished
+	--
+	procedure expect_osif_sem_wait (
+		signal   clk     : in  std_logic;
+		signal   i_osif  : in  i_osif_test_t;
+		signal   o_osif  : out o_osif_test_t;
+		constant handle  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
+		constant result  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0) := (others => '0');
+		constant timeout : in  time := DEFAULT_TIMEOUT
+	);
+	
 --	-- Locks the muteout specified by handle.
 --	--
 --	--   i_osif - i_osif_t record
@@ -993,12 +995,64 @@ package body reconos_test_pkg is
 		return result;
 	end function ignore_yield;
 
+	function CallIdToString(
+		constant call_id : in osif_word
+	) return string is begin
+		case ignore_yield(call_id) is
+			when X"000000A0" =>
+				return "OSIF_CMD_THREAD_GET_INIT_DATA";
+			when X"000000A1" =>
+				return "OSIF_CMD_THREAD_DELAY";
+			when X"000000A2" =>
+				return "OSIF_CMD_THREAD_EXIT";
+			when X"000000A3" =>
+				return "OSIF_CMD_THREAD_YIELD";
+			when X"000000A4" =>
+				return "OSIF_CMD_THREAD_RESUME";
+			when X"000000A5" =>
+				return "OSIF_CMD_THREAD_LOAD_STATE";
+			when X"000000A6" =>
+				return "OSIF_CMD_THREAD_STORE_STATE";
+			when X"000000B0" =>
+				return "OSIF_CMD_SEM_POST";
+			when X"000000B1" =>
+				return "OSIF_CMD_SEM_WAIT";
+			when X"000000C0" =>
+				return "OSIF_CMD_MUTEX_LOCK";
+			when X"000000C1" =>
+				return "OSIF_CMD_MUTEX_UNLOCK";
+			when X"000000C2" =>
+				return "OSIF_CMD_MUTEX_TRYLOCK";
+			when X"000000D0" =>
+				return "OSIF_CMD_COND_WAIT";
+			when X"000000D1" =>
+				return "OSIF_CMD_COND_SIGNAL";
+			when X"000000D2" =>
+				return "OSIF_CMD_COND_BROADCAST";
+			when X"000000E0" =>
+				return "OSIF_CMD_RQ_RECEIVE";
+			when X"000000E1" =>
+				return "OSIF_CMD_RQ_SEND";
+			when X"000000F0" =>
+				return "OSIF_CMD_MBOX_GET";
+			when X"000000F1" =>
+				return "OSIF_CMD_MBOX_PUT";
+			when X"000000F2" =>
+				return "OSIF_CMD_MBOX_TRYGET";
+			when X"000000F3" =>
+				return "OSIF_CMD_MBOX_TRYPUT";
+			when others =>
+				return to_string(ignore_yield(call_id));
+		end case;
+	end function CallIdToString;
+
 	procedure assertCallIdEqual(
 		constant actual_call_id   : in osif_word;
 		constant expected_call_id : in osif_word
 	) is begin
 		assert ignore_yield(actual_call_id) = expected_call_id
-			report "Call ID is " & to_string(ignore_yield(actual_call_id)) & " instead of " & to_string(expected_call_id)
+			report "Call ID is " & CallIdToString(actual_call_id) & " instead of " & CallIdToString(expected_call_id)
+				& " (" & to_string(ignore_yield(actual_call_id)) & " instead of " & to_string(expected_call_id) & ")"
 			severity failure;
 	end procedure assertCallIdEqual;
 
@@ -1033,7 +1087,8 @@ package body reconos_test_pkg is
 		assertCallIdEqual(tmp, expected_call_id);
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg0, "arg0 (expected call id is " & to_string(expected_call_id) & ")");
+		assertEqual(tmp, expected_arg0, "arg0 (expected call id is "
+			& CallIdToString(expected_call_id) & " (" & to_string(expected_call_id) & "))");
 
 		expect_fifo_pull_word(clk, i_osif, o_osif, result, timeout);
 	end procedure expect_osif_call_1;
@@ -1054,7 +1109,8 @@ package body reconos_test_pkg is
 		assertCallIdEqual(tmp, expected_call_id);
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg0, "arg0 (expected call id is " & to_string(expected_call_id) & ")");
+		assertEqual(tmp, expected_arg0, "arg0 (expected call id is "
+			& CallIdToString(expected_call_id) & " (" & to_string(expected_call_id) & "))");
 
 		expect_fifo_pull_word(clk, i_osif, o_osif, result1, timeout);
 
@@ -1077,13 +1133,39 @@ package body reconos_test_pkg is
 		assertCallIdEqual(tmp, expected_call_id);
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg0, "arg0 (expected call id is " & to_string(expected_call_id) & ")");
+		assertEqual(tmp, expected_arg0, "arg0 (expected call id is "
+			& CallIdToString(expected_call_id) & " (" & to_string(expected_call_id) & "))");
 
 		expect_fifo_push_word(clk, i_osif, o_osif, tmp, timeout);
-		assertEqual(tmp, expected_arg1, "arg1 (expected call id is " & to_string(expected_call_id) & ")");
+		assertEqual(tmp, expected_arg1, "arg1 (expected call id is "
+			& CallIdToString(expected_call_id) & " (" & to_string(expected_call_id) & "))");
 
 		expect_fifo_pull_word(clk, i_osif, o_osif, result, timeout);
 	end procedure expect_osif_call_2;
+
+	procedure expect_osif_sem_post (
+		signal   clk     : in  std_logic;
+		signal   i_osif  : in  i_osif_test_t;
+		signal   o_osif  : out o_osif_test_t;
+		constant handle  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
+		constant result  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0) := (others => '0');
+		constant timeout : in  time := DEFAULT_TIMEOUT
+	) is
+	begin
+		expect_osif_call_1(clk, i_osif, o_osif, OSIF_CMD_SEM_POST, handle, result, timeout);
+	end procedure expect_osif_sem_post;
+
+	procedure expect_osif_sem_wait (
+		signal   clk     : in  std_logic;
+		signal   i_osif  : in  i_osif_test_t;
+		signal   o_osif  : out o_osif_test_t;
+		constant handle  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0);
+		constant result  : in  std_logic_vector(C_OSIF_WIDTH - 1 downto 0) := (others => '0');
+		constant timeout : in  time := DEFAULT_TIMEOUT
+	) is
+	begin
+		expect_osif_call_1(clk, i_osif, o_osif, OSIF_CMD_SEM_WAIT, handle, result, timeout);
+	end procedure expect_osif_sem_wait;
 
 	procedure expect_osif_mbox_put (
 		signal clk       : in  std_logic;
